@@ -36,13 +36,16 @@ def politicas_desactualizadas():
     plt.title('Top 5 webs desactualizadas')
     plt.show()
 
-def comparar_webs_creacion(con):
-    df = pd.read_sql_query("SELECT * from legal ORDER BY url", con)
+def comparar_webs_creacion(con, ano):
+    df = pd.read_sql_query("SELECT * from legal WHERE creacion="+str(ano)+" ORDER BY url", con)
     df["Politicas"] = 3 - df["cookies"] - df["aviso"] - df["proteccion_de_datos"]
     print("-----------------------")
-    print("Paginas segun fecha de creacion que cumplen")
+    print("Paginas del "+str(ano)+" que cumplen politicas")
     print("-----------------------")
     print(df[df["Politicas"] == 0])
+    print("-----------------------")
+    print("Paginas del "+str(ano)+" que NO cumplen politicas")
+    print("-----------------------")
     print(df[df["Politicas"] != 0])
     
 
@@ -51,5 +54,5 @@ def comparar_webs_creacion(con):
 con = sqlite3.connect('example.db')
 #usuarios_vulnerables(con)
 #politicas_desactualizadas(con)
-comparar_webs_creacion(con)
+comparar_webs_creacion(con, 2001)
 con.close()
