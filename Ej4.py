@@ -1,9 +1,7 @@
 import sqlite3
 import pandas as pd
 from ast import literal_eval
-import statistics
 import numpy as np
-import math
 import matplotlib.pyplot as plt
 import hashlib
 
@@ -71,14 +69,14 @@ def media_conexiones_passwords_comprometidas(con):
             comprometidos.append(row)
     sum = 0
     for comprometido in comprometidos:
-        if comprometido["ips"] != "None":
-            sum+= len(literal_eval(comprometido["ips"]))
+        if comprometido["fechas"] != "None":
+            sum+= len(literal_eval(comprometido["fechas"]))
     print("Media de conexiones de usuarios comprometidos: "+str(sum/len(comprometidos)))
 
     sum = 0
     for no_comprometido in no_comprometidos:
-        if no_comprometido["ips"] != "None":
-            sum+= len(literal_eval(no_comprometido["ips"]))
+        if no_comprometido["fechas"] != "None":
+            sum+= len(literal_eval(no_comprometido["fechas"]))
     print("Media de conexiones de usuarios NO comprometidos: "+str(sum/len(no_comprometidos)))
     
 def comparar_passwords_comprometidas(con):
