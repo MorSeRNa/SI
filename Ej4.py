@@ -12,8 +12,8 @@ def esPasswordSegura(password):
         for i in f.read().splitlines():
             linea = hashlib.md5(bytes(i, encoding='utf8'))
             if linea.hexdigest() == password:
-                return 1
-    return 0
+                return 0
+    return 1
 
 def usuarios_vulnerables(con):
     df = pd.read_sql_query("SELECT * from usuarios", con)
@@ -26,8 +26,6 @@ def usuarios_vulnerables(con):
     
     df = df[df["secure_pass"] == 0]
     df = df.sort_values(["probabilidad"], ascending=[False])
-
-    print(df)
     df = df.head(10)
     plt.bar(np.arange(len(df)), df['probabilidad'], width=0.4, color='r', label='cookies')
     plt.xticks(np.arange(len(df))+0.4, df["id_usuario"])
@@ -36,7 +34,7 @@ def usuarios_vulnerables(con):
     plt.title('Top 10 usuarios críticos')
     plt.show()
 
-def politicas_desactualizadas():
+def politicas_desactualizadas(con):
     df = pd.read_sql_query("SELECT * from legal ORDER BY url", con)
     df["Politicas"] = 3 - df["cookies"] - df["aviso"] - df["proteccion_de_datos"]
     df = df.sort_values(["Politicas","creacion"], ascending=[False, True])
@@ -62,7 +60,27 @@ def comparar_webs_creacion(con, ano):
     print("-----------------------")
     print(df[df["Politicas"] != 0])
     
+def media_conexiones_passwords_comprometidas(con):
+    df = pd.read_sql_query("SELECT * from usuarios", con)
+    comprometidos = []
+    no_comprometidos = []
+    for index, row in df.iterrows():
+        if(esPasswordSegura(row["contrasena"])):
+            no_comprometidos.append(row)
+        else:
+            comprometidos.append(row)
+    sum = 0
+    for comprometido in comprometidos:
+        if comprometido["ips"] != "None":
+            sum+= len(literal_eval(comprometido["ips"]))
+    print("Media de conexiones de usuarios comprometidos: "+str(sum/len(comprometidos)))
 
+    sum = 0
+    for no_comprometido in no_comprometidos:
+        if no_comprometido["ips"] != "None":
+            sum+= len(literal_eval(no_comprometido["ips"]))
+    print("Media de conexiones de usuarios NO comprometidos: "+str(sum/len(no_comprometidos)))
+    
 def comparar_passwords_comprometidas(con):
     df = pd.read_sql_query("SELECT * from usuarios", con)
     comprometidos = []
@@ -81,6 +99,7 @@ def comparar_passwords_comprometidas(con):
 con = sqlite3.connect('example.db')
 usuarios_vulnerables(con)
 politicas_desactualizadas(con)
+media_conexiones_passwords_comprometidas(con)
 comparar_webs_creacion(con, 2001)
 comparar_passwords_comprometidas(con)
 con.close()
