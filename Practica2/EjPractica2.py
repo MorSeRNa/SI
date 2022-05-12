@@ -41,7 +41,7 @@ def pdf_generate():
             df["id"] = pd.read_json(json)["id"]
             df["summary"] = pd.read_json(json)["summary"]
             html = render_template('vulnerabilities_pdf.html', vulns=df.head(10).to_html())
-            pdfkit.from_string(html, 'static/pdf/out.pdf',configuration = config)
+            pdfkit.from_string(html, 'static/pdf/out.pdf',configuration=config)
         else:
             raise Exception
     
