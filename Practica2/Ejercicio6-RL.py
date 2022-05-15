@@ -3,8 +3,6 @@ import numpy as np
 import pandas as pd
 import json
 from sklearn import linear_model
-from sklearn.metrics import mean_squared_error
-import hashlib
 
 
 with open("users_IA_clases.json", "r") as file:
@@ -24,19 +22,9 @@ df_data = df.to_numpy()
 ##linear regression##
 
 df_data = df_data[:, np.newaxis, 2]
-
-
 regr = linear_model.LinearRegression()
-regr.fit(df_data, df["vulnerable"].to_numpy())
-print(regr.coef_)
-
+regr.fit(df_data, df["prob_click"].to_numpy())
 df_vuln_pred = regr.predict(df_data)
-print("Linear Regression mean squared error: %.2f" % mean_squared_error(df["vulnerable"].to_numpy(), df_vuln_pred))
-plt.scatter(df_data, df["vulnerable"].to_numpy(), color="black")
-plt.plot(df_data, df_vuln_pred, color="blue", linewidth=3)
-plt.xticks(())
-plt.yticks(())
-plt.show()
 
 
 ################################################################################################################
